@@ -1,6 +1,6 @@
 {
   "name": "@transomjs/transom-mongoose-localuser",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Add local authentication to your Transom REST API.",
   "main": "index.js",
   "scripts": {
