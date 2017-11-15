@@ -11,4 +11,10 @@ $ npm install transom-mongoose-localuser
 ```
 
 ## Usage
-...Work in progress
+
+#### Options
+Optional configuration values include the named handlers for:
+ - emailHandler : (default 'transomSmtp')
+ - templateHandler : (default 'transomTemplate')
+ - nonceHandler : (default 'transomNonce')
+

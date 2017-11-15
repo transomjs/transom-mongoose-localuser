@@ -10,11 +10,11 @@ const isLoggedInMiddleware = require('./lib/isLoggedInMiddleware');
 const initializeAcl = require('./lib/initializeAcl');
 
 const TransomLocalUser = function() {
-	debug("Initializing Transom-localUser");
+	debug("Creating Transom-mongoose-localUser");
 
 	this.initialize = function(server, options) {
 
-		debug("Initializing Transom-localUser...");
+		debug("Initializing Transom-mongoose-localUser...");
 
 		server.registry.set('passport', passport);
 
@@ -27,7 +27,11 @@ const TransomLocalUser = function() {
 			initializeAcl.createDefaultUser(server);
 		}
 
-		const localUserHandler = LocalUserHandler(server);
+		const localUserHandler = LocalUserHandler(server, {
+			emailHandler: options.emailHandler || 'transomSmtp',
+			templateHandler: options.templateHandler || 'transomTemplate',
+			nonceHandler: options.nonceHandler || 'transomNonce'
+		});
 
 		// *After* creating the required Mongoose models!
 		passportStrategies({
