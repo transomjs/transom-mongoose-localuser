@@ -20,7 +20,8 @@ describe('LocalUserHandler', function (done) {
         server.registry = new PocketRegistry();
         mongoose.Promise = Promise;
         server.registry.set('mongoose', mongoose);
-
+        server.registry.set('transom-config.definition.uri.prefix', '/api/v1');
+        
         server.get = function() {
             server.registry.set(`get|${arguments[0]}`, Array.prototype.slice.call(arguments, 1))
         }
