@@ -42,11 +42,13 @@ const TransomLocalUser = function() {
 		const preMiddleware = options.preMiddleware || [];
 		const postMiddleware = options.postMiddleware || [];
 
-		server.post('/v1/:__api_code/:__version/user/signup', preMiddleware, localUserHandler.handleSignup, postMiddleware);
-		server.post('/v1/:__api_code/:__version/user/verify', preMiddleware, localUserHandler.handleVerify, postMiddleware);
-		server.post('/v1/:__api_code/:__version/user/login', preMiddleware, localUserHandler.handleLogin, postMiddleware);
-		server.post('/v1/:__api_code/:__version/user/forgot', preMiddleware, localUserHandler.handleForgot, postMiddleware);
-		server.post('/v1/:__api_code/:__version/user/reset', preMiddleware, localUserHandler.handleReset, postMiddleware);
+		const uriPrefix = server.registry.get('transom-config.definition.uri.prefix');		
+
+		server.post(`${uriPrefix}/user/signup`, preMiddleware, localUserHandler.handleSignup, postMiddleware);
+		server.post(`${uriPrefix}/user/verify`, preMiddleware, localUserHandler.handleVerify, postMiddleware);
+		server.post(`${uriPrefix}/user/login`, preMiddleware, localUserHandler.handleLogin, postMiddleware);
+		server.post(`${uriPrefix}/user/forgot`, preMiddleware, localUserHandler.handleForgot, postMiddleware);
+		server.post(`${uriPrefix}/user/reset`, preMiddleware, localUserHandler.handleReset, postMiddleware);
 
 		// Check isLoggedIn first on the following routes.
 		const mware = isLoggedInMiddleware({
@@ -57,9 +59,9 @@ const TransomLocalUser = function() {
 
 		let preMiddlewareAlt = [server.registry.get('isLoggedIn'), ...preMiddleware];
 
-		server.get('/v1/:__api_code/:__version/user/me', preMiddlewareAlt, localUserHandler.handleUserMe, postMiddleware);
-		server.get('/v1/:__api_code/:__version/user/sockettoken', preMiddlewareAlt, localUserHandler.handleSocketToken, postMiddleware);
-		server.post('/v1/:__api_code/:__version/user/logout', preMiddlewareAlt, localUserHandler.handleLogout, postMiddleware);
+		server.get(`${uriPrefix}/user/me`, preMiddlewareAlt, localUserHandler.handleUserMe, postMiddleware);
+		server.get(`${uriPrefix}/user/sockettoken`, preMiddlewareAlt, localUserHandler.handleSocketToken, postMiddleware);
+		server.post(`${uriPrefix}/user/logout`, preMiddlewareAlt, localUserHandler.handleLogout, postMiddleware);
 	}
 }
 
