@@ -33,7 +33,7 @@ const TransomLocalUser = function() {
 			nonceHandler: options.nonceHandler || 'transomNonce'
 		});
 
-		// *After* creating the required Mongoose models!
+		// Create strategies *after* creating the required Mongoose models!
 		passportStrategies({
 			mongoose,
 			passport
@@ -49,6 +49,7 @@ const TransomLocalUser = function() {
 		server.post(`${uriPrefix}/user/login`, preMiddleware, localUserHandler.handleLogin, postMiddleware);
 		server.post(`${uriPrefix}/user/forgot`, preMiddleware, localUserHandler.handleForgot, postMiddleware);
 		server.post(`${uriPrefix}/user/reset`, preMiddleware, localUserHandler.handleReset, postMiddleware);
+		server.post(`${uriPrefix}/user/logout`, preMiddleware, localUserHandler.handleLogout, postMiddleware);
 
 		// Check isLoggedIn first on the following routes.
 		const mware = isLoggedInMiddleware({
@@ -61,7 +62,6 @@ const TransomLocalUser = function() {
 
 		server.get(`${uriPrefix}/user/me`, preMiddlewareAlt, localUserHandler.handleUserMe, postMiddleware);
 		server.get(`${uriPrefix}/user/sockettoken`, preMiddlewareAlt, localUserHandler.handleSocketToken, postMiddleware);
-		server.post(`${uriPrefix}/user/logout`, preMiddlewareAlt, localUserHandler.handleLogout, postMiddleware);
 	}
 }
 
