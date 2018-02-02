@@ -49,10 +49,10 @@ The transon-mongoose-locauser plugin will create the following routes on your AP
 #### /user/signup
 |End Point| Method | Payload | Description                    |
 |---------|--------|---------|--------------------------------|
-|/user/signup| POST | user object | Creates a new user object. It will send an email to the user to verify the email address|
-|/user/verify| POST | The verification token on the query string | Validates the user by means of the token, once completed the user can use the login route|
-|/user/login | POST | encoded username and password | The login route uses [basic authentication](https://swagger.io/docs/specification/authentication/basic-authentication/) using the `Authorization` header with the username and password, seperated by a colon, and encoded in base64. It returns a token that must be used as a bearer token in the `Authorization` header, for accessing secured end points in the API. Remember that https must be used for keeping user credentials secure!.  |
-| /user/logout | POST | ... | Invalidate the bearer token |
-| /user/forgot | POST | eail address | Sends an email, if the address is found in the user database. The email contains a token that must be presented on the reset request |
-| /user/reset | POST | ... | provide the new password along with the token that was generated in an email through the `forgot` request. |
+|/user/signup| POST | { username, password, email, display_name }| Creates a new user object. It will send an email to the user to verify the email address, as well the reponse object contains the full verification url|
+|/user/verify| POST | { token } | Validates the user by means of the token, once completed the user can use the login route|
+|/user/login | POST | {} | The login route uses [basic authentication](https://swagger.io/docs/specification/authentication/basic-authentication/) using the `Authorization` header with the username and password, seperated by a colon, and encoded in base64. It returns a token that must be used as a bearer token in the `Authorization` header, for accessing secured end points in the API. Remember that https must be used for keeping user credentials secure!.  |
+| /user/logout | POST | {} | Invalidate the bearer token |
+| /user/forgot | POST | { email} | Sends an email, if the address is found in the user database. The email contains a token that must be presented on the reset request |
+| /user/reset | POST | { token, email, password } | provide the new password along with the token that was generated in an email through the `forgot` request. |
 
