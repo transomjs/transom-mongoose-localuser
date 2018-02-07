@@ -8,6 +8,7 @@ const LocalUserHandler = require('./lib/localUserHandler');
 const passportStrategies = require('./lib/passportStrategies');
 const isLoggedInMiddleware = require('./lib/isLoggedInMiddleware');
 const initializeAcl = require('./lib/initializeAcl');
+const localUserClient = require('./lib/localUserClient');
 
 const TransomLocalUser = function() {
 	debug("Creating Transom-mongoose-localUser");
@@ -22,10 +23,11 @@ const TransomLocalUser = function() {
 		mongoose.model('TransomAclUser', localAclUserSchema.AclUserSchema(mongoose));
 		mongoose.model('TransomAclGroup', localAclGroupSchema.AclGroupSchema(mongoose));
 
-		if (process.env.NODE_ENV !== 'production') {
-			initializeAcl.createGroups(server);
-			initializeAcl.createDefaultUser(server);
-		}
+		
+		//initializeAcl.createGroups(server); each plugin should call transomLocalUserClient.setGroups(server, groups)
+		initializeAcl.createDefaultUser(server);
+
+		server.registry.set('transomLocalUserClient', localUserClient);
 
 		const localUserHandler = LocalUserHandler(server, {
 			emailHandler: options.emailHandler || 'transomSmtp',
