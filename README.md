@@ -11,49 +11,61 @@ $ npm install transom-mongoose-localuser --save
 ```
 
 ## Overview
-The transom-mongoose-local-user plugin is the security provider for the TransomJS Api. It maintains a database of the users and groups in the MongoDB database, and it provides the API end points to support the routes of user signup and logging on/off.
+The transom-mongoose-local-user plugin is the security provider for the TransomJS Api. It maintains a database of the users and groups in the MongoDB database, and it provides the API endpoints to support new user registration and login and logging off etc.
 
-The transom-mongoose-local-user plugin also tightly integrates with the [transon-mongoose](https://github.com/transomjs/transom-mongoose) and [transom-server-functions](https://github.com/transomjs/transom-server-functions) plugins for the securing their end-points
+The transom-mongoose-local-user plugin tightly integrates with the [transon-mongoose](https://github.com/transomjs/transom-mongoose) and [transom-server-functions](https://github.com/transomjs/transom-server-functions) plugins by providing middleware for securing their endpoints.
 
 
 ## Usage
 
 ```javascript
-var TransomCore = require('@transomjs/transom-core');
+const TransomCore = require('@transomjs/transom-core');
 
-//transonMongoose is required for using transom-mongoose-local-user
-var transomLocalUser = require('@transomjs/transom-mongoose-localuser');
+// transonMongoose is required when using transom-mongoose-local-user
+const transomLocalUser = require('@transomjs/transom-mongoose-localuser');
 
 const transom = new TransomCore();
 
-var localUserOptions = {};
+const localUserOptions = {};
 
 transom.configure(transomLocalUser, localUserOptions);
 
-var myApi = require('./myApi');
+const myApi = require('./myApi');
 
 // Initialize them all at once.
-var server = transom.initialize(myApi);
+const server = transom.initialize(myApi);
 ```
 
 #### Options
-The Api end points the support the workflows for creating and verifying users and resetting passwords can utilize plugins for sending emails and creating (email) content from templates. Defaults are used when the options object does not provider alternates. The values on the options object are the registry key strings that return the corresponding handler.<br/>
+The API endpoints created by transom-mongoose-localuser support the workflows for creating and verifying users and resetting passwords. It will utilize plugins for sending emails and creating email content from templates. Defaults are used when the options object does not provide alternates. The values on the options object are the registry key strings that return the corresponding handler.<br/>
 Optional configuration values include the named handlers for:
  - emailHandler : (default 'transomSmtp')
  - templateHandler : (default 'transomTemplate')
  - nonceHandler : (default 'transomNonce')
 
-#### Security End-points
-The transon-mongoose-locauser plugin will create the following routes on your API:
+#### Security Endpoints
+The transon-mongoose-localuser plugin will create the following routes on a TransomJS REST-API:
 
-#### /user/signup
-|End Point| Method | Payload | Description                    |
+|Endpoint| Method | Payload | Description                    |
 |---------|--------|---------|--------------------------------|
-|/user/signup| POST | { username, password, email, display_name }| Creates a new user object. It will send an email to the user to verify the email address, as well the reponse object contains the full verification url|
+|/user/signup| POST | { username, password, email, display_name }| Creates a new user object. It will send an email to the user to verify the email address, as well the reponse object contains the full verification url.|
 |/user/verify| POST | { token } | Validates the user by means of the token, once completed the user can use the login route|
-|/user/login | POST | {} | The login route uses [basic authentication](https://swagger.io/docs/specification/authentication/basic-authentication/) using the `Authorization` header with the username and password, seperated by a colon, and encoded in base64. It returns a token that must be used as a bearer token in the `Authorization` header, for accessing secured end points in the API. Remember that https must be used for keeping user credentials secure!.  |
-| /user/logout | POST | {} | Invalidate the bearer token |
-| /user/forgot | POST | { email} | Sends an email, if the address is found in the user database. The email contains a token that must be presented on the reset request |
-| /user/reset | POST | { token, email, password } | provide the new password along with the token that was generated in an email through the `forgot` request. |
+|/user/login | POST | {} | The login route uses [basic authentication](https://swagger.io/docs/specification/authentication/basic-authentication/) using the `Authorization` header with the username and password, seperated by a colon, and encoded in base64. It returns a token that must be used as a bearer token in the `Authorization` header, for accessing secured end points in the API. Remember that https must be used for keeping user credentials secure!  |
+| /user/logout | POST | {} | Invalidate the current bearer token. |
+| /user/forgot | POST | { email} | Sends an email if the provided email address is found in the user database. The email contains a token that must be presented on the reset request. |
+| /user/reset | POST | { token, email, password } | Provide the new password along with the token that was generated in an email through the `forgot` request. |
 | /user/me | GET | none | (Requires a valid Authorization header) Provide a sanitized copy of the local User Object. |
 | /user/sockettoken | GET | none | (Requires a valid Authorization header) Provide the token to be used with the internal SocketIO server. |
+
+#### Middleware
+After successful initialization of this module there will be an entry in the Transom server registry for validating that the current user (as identified by the Authorization header) is, in fact, Authenticated.
+It can be acccessed using `server.registry.get('isLoggedIn')`.
+```
+const uriPrefix = server.registry.get('transom-config.definition.uri.prefix');
+const isLoggedIn = server.registry.get('isLoggedIn');
+// Add it to your own routes with your own pre-middleware.
+const yourPreMiddleware = [isLoggedIn, ...preMiddleware];
+const yourPostMiddleware = [];
+server.get(`${uriPrefix}/something/secure`, yourPreMiddleware, mySecuredFeature, yourPostMiddleware);
+```
+
