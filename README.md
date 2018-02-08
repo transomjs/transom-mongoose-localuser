@@ -52,7 +52,7 @@ The transon-mongoose-localuser plugin will create the following routes on a Tran
 |/user/verify| POST | { token } | Validates the user by means of the token, once completed the user can use the login route|
 |/user/login | POST | {} | The login route uses [basic authentication](https://swagger.io/docs/specification/authentication/basic-authentication/) using the `Authorization` header with the username and password, seperated by a colon, and encoded in base64. It returns a token that must be used as a bearer token in the `Authorization` header, for accessing secured end points in the API. Remember that https must be used for keeping user credentials secure!  |
 | /user/logout | POST | {} | Invalidate the current bearer token. |
-| /user/forgot | POST | { email} | Sends an email if the provided email address is found in the user database. The email contains a token that must be presented on the reset request. |
+| /user/forgot | POST | { email } | Sends an email if the provided email address is found in the user database. The email contains a token that must be presented on the reset request. |
 | /user/reset | POST | { token, email, password } | Provide the new password along with the token that was generated in an email through the `forgot` request. |
 | /user/me | GET | none | (Requires a valid Authorization header) Provide a sanitized copy of the local User Object. |
 | /user/sockettoken | GET | none | (Requires a valid Authorization header) Provide the token to be used with the internal SocketIO server. |
@@ -60,7 +60,7 @@ The transon-mongoose-localuser plugin will create the following routes on a Tran
 #### Middleware
 After successful initialization of this module there will be an entry in the Transom server registry for validating that the current user (as identified by the Authorization header) is, in fact, Authenticated.
 It can be acccessed using `server.registry.get('isLoggedIn')`.
-```
+```javascript
 const uriPrefix = server.registry.get('transom-config.definition.uri.prefix');
 const isLoggedIn = server.registry.get('isLoggedIn');
 // Add it to your own routes with your own pre-middleware.
