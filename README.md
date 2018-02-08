@@ -55,4 +55,5 @@ The transon-mongoose-locauser plugin will create the following routes on your AP
 | /user/logout | POST | {} | Invalidate the bearer token |
 | /user/forgot | POST | { email} | Sends an email, if the address is found in the user database. The email contains a token that must be presented on the reset request |
 | /user/reset | POST | { token, email, password } | provide the new password along with the token that was generated in an email through the `forgot` request. |
-
+| /user/me | GET | none | (Requires a valid Authorization header) Provide a sanitized copy of the local User Object. |
+| /user/sockettoken | GET | none | (Requires a valid Authorization header) Provide the token to be used with the internal SocketIO server. |
