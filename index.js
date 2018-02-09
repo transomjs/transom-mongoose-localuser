@@ -11,59 +11,76 @@ const initializeAcl = require('./lib/initializeAcl');
 const localUserClient = require('./lib/localUserClient');
 
 const TransomLocalUser = function() {
+
 	debug("Creating Transom-mongoose-localUser");
-
 	this.initialize = function(server, options) {
+		return new Promise(function(resolve, reject){
 
-		debug("Initializing Transom-mongoose-localUser...");
+			var modelIndexCount = 0;
+			const finalizeIndexCreation = function(err){
+				if (err){
+					return reject(err);
+				}
+				modelIndexCount++;
+				if (modelIndexCount == 2){
+					resolve();
+				}
+			};
 
-		server.registry.set('passport', passport);
+			debug("Initializing Transom-mongoose-localUser...");
+			
 
-		const mongoose = server.registry.get('mongoose');
-		mongoose.model('TransomAclUser', localAclUserSchema.AclUserSchema(mongoose));
-		mongoose.model('TransomAclGroup', localAclGroupSchema.AclGroupSchema(mongoose));
+			server.registry.set('passport', passport);
 
-		
-		//initializeAcl.createGroups(server); each plugin should call transomLocalUserClient.setGroups(server, groups)
-		initializeAcl.createDefaultUser(server);
+			const mongoose = server.registry.get('mongoose');
+			const transomAclUser = mongoose.model('TransomAclUser', localAclUserSchema.AclUserSchema(mongoose));
+			const transomAclGroup = mongoose.model('TransomAclGroup', localAclGroupSchema.AclGroupSchema(mongoose));
 
-		server.registry.set('transomLocalUserClient', localUserClient);
+			transomAclUser.on('index', finalizeIndexCreation);
 
-		const localUserHandler = LocalUserHandler(server, {
-			emailHandler: options.emailHandler || 'transomSmtp',
-			templateHandler: options.templateHandler || 'transomTemplate',
-			nonceHandler: options.nonceHandler || 'transomNonce'
+			transomAclGroup.on('index', finalizeIndexCreation);
+
+			//initializeAcl.createGroups(server); each plugin should call transomLocalUserClient.setGroups(server, groups)
+			initializeAcl.createDefaultUser(server);
+
+			server.registry.set('transomLocalUserClient', localUserClient);
+
+			const localUserHandler = LocalUserHandler(server, {
+				emailHandler: options.emailHandler || 'transomSmtp',
+				templateHandler: options.templateHandler || 'transomTemplate',
+				nonceHandler: options.nonceHandler || 'transomNonce'
+			});
+
+			// Create strategies *after* creating the required Mongoose models!
+			passportStrategies({
+				mongoose,
+				passport
+			});
+
+			const preMiddleware = options.preMiddleware || [];
+			const postMiddleware = options.postMiddleware || [];
+
+			const uriPrefix = server.registry.get('transom-config.definition.uri.prefix');		
+
+			server.post(`${uriPrefix}/user/signup`, preMiddleware, localUserHandler.handleSignup, postMiddleware);
+			server.post(`${uriPrefix}/user/verify`, preMiddleware, localUserHandler.handleVerify, postMiddleware);
+			server.post(`${uriPrefix}/user/login`, preMiddleware, localUserHandler.handleLogin, postMiddleware);
+			server.post(`${uriPrefix}/user/forgot`, preMiddleware, localUserHandler.handleForgot, postMiddleware);
+			server.post(`${uriPrefix}/user/reset`, preMiddleware, localUserHandler.handleReset, postMiddleware);
+			server.post(`${uriPrefix}/user/logout`, preMiddleware, localUserHandler.handleLogout, postMiddleware);
+
+			// Check isLoggedIn first on the following routes.
+			const mware = isLoggedInMiddleware({
+				mongoose: server.registry.get('mongoose'),
+				passport: server.registry.get('passport')
+			});
+			server.registry.set('isLoggedIn', mware.isLoggedIn);
+
+			let preMiddlewareAlt = [server.registry.get('isLoggedIn'), ...preMiddleware];
+
+			server.get(`${uriPrefix}/user/me`, preMiddlewareAlt, localUserHandler.handleUserMe, postMiddleware);
+			server.get(`${uriPrefix}/user/sockettoken`, preMiddlewareAlt, localUserHandler.handleSocketToken, postMiddleware);
 		});
-
-		// Create strategies *after* creating the required Mongoose models!
-		passportStrategies({
-			mongoose,
-			passport
-		});
-
-		const preMiddleware = options.preMiddleware || [];
-		const postMiddleware = options.postMiddleware || [];
-
-		const uriPrefix = server.registry.get('transom-config.definition.uri.prefix');		
-
-		server.post(`${uriPrefix}/user/signup`, preMiddleware, localUserHandler.handleSignup, postMiddleware);
-		server.post(`${uriPrefix}/user/verify`, preMiddleware, localUserHandler.handleVerify, postMiddleware);
-		server.post(`${uriPrefix}/user/login`, preMiddleware, localUserHandler.handleLogin, postMiddleware);
-		server.post(`${uriPrefix}/user/forgot`, preMiddleware, localUserHandler.handleForgot, postMiddleware);
-		server.post(`${uriPrefix}/user/reset`, preMiddleware, localUserHandler.handleReset, postMiddleware);
-		server.post(`${uriPrefix}/user/logout`, preMiddleware, localUserHandler.handleLogout, postMiddleware);
-
-		// Check isLoggedIn first on the following routes.
-		const mware = isLoggedInMiddleware({
-			mongoose: server.registry.get('mongoose'),
-			passport: server.registry.get('passport')
-		});
-		server.registry.set('isLoggedIn', mware.isLoggedIn);
-
-		let preMiddlewareAlt = [server.registry.get('isLoggedIn'), ...preMiddleware];
-
-		server.get(`${uriPrefix}/user/me`, preMiddlewareAlt, localUserHandler.handleUserMe, postMiddleware);
-		server.get(`${uriPrefix}/user/sockettoken`, preMiddlewareAlt, localUserHandler.handleSocketToken, postMiddleware);
 	}
 }
 
