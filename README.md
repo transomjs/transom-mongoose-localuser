@@ -33,7 +33,9 @@ transom.configure(transomLocalUser, localUserOptions);
 const myApi = require('./myApi');
 
 // Initialize them all at once.
-const server = transom.initialize(myApi);
+transom.initialize(myApi).then(function(server){
+ ...
+});
 ```
 
 #### Options
