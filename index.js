@@ -87,7 +87,7 @@ const TransomLocalUser = function () {
 			// Only logged in users with the 'sysadmin' group can do this!
 			const sysadmin = options.sysadmin || 'sysadmin'; 
 			const preMiddlewareWithGroups = [middleware.isLoggedInMiddleware(), middleware.groupMembershipMiddleware(sysadmin), ...preMiddleware];
-			server.post(`${uriPrefix}/user/:id/forceLogout`, preMiddlewareAlt, localUserHandler.handleForceLogout, postMiddleware);
+			server.post(`${uriPrefix}/user/:id/forceLogout`, preMiddlewareWithGroups, localUserHandler.handleForceLogout, postMiddleware);
 		});
 	}
 }
