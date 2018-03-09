@@ -17,7 +17,7 @@ const TransomLocalUser = function () {
 	this.initialize = function (server, options) {
 		return new Promise(function (resolve, reject) {
 		
-			const modelIndexCount = 0;
+			let modelIndexCount = 0;
 			const finalizeIndexCreation = function (err) {
 				if (err) {
 					return reject(err);
