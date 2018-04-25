@@ -30,6 +30,9 @@ const TransomLocalUser = function () {
 
 			debug("Initializing Transom-mongoose-localUser...");
 			
+			const apiLocaluser = server.registry.get('transom-config.definition.localuser', {});
+			const localuserOptions = Object.assign({}, apiLocaluser, options);
+			
 			server.registry.set('passport', passport);
 
 			const mongoose = server.registry.get('mongoose');
@@ -47,9 +50,9 @@ const TransomLocalUser = function () {
 			server.registry.set('transomLocalUserClient', localUserClient);
 
 			const localUserHandler = LocalUserHandler(server, {
-				emailHandler: options.emailHandler || 'transomSmtp',
-				templateHandler: options.templateHandler || 'transomTemplate',
-				nonceHandler: options.nonceHandler || 'transomNonce'
+				emailHandler: localuserOptions.emailHandler || 'transomSmtp',
+				templateHandler: localuserOptions.templateHandler || 'transomTemplate',
+				nonceHandler: localuserOptions.nonceHandler || 'transomNonce'
 			});
 
 			// Create strategies *after* creating the required Mongoose models!
@@ -58,16 +61,25 @@ const TransomLocalUser = function () {
 				passport
 			});
 
-			const preMiddleware = options.preMiddleware || [];
-			const postMiddleware = options.postMiddleware || [];
+			const preMiddleware = localuserOptions.preMiddleware || [];
+			const postMiddleware = localuserOptions.postMiddleware || [];
 
-			const uriPrefix = server.registry.get('transom-config.definition.uri.prefix');		
+			const uriPrefix = server.registry.get('transom-config.definition.uri.prefix');
 
-			server.post(`${uriPrefix}/user/signup`, preMiddleware, localUserHandler.handleSignup, postMiddleware);
-			server.post(`${uriPrefix}/user/verify`, preMiddleware, localUserHandler.handleVerify, postMiddleware);
+			localuserOptions.signup = localuserOptions.signup === undefined ? true : localuserOptions.signup;
+			localuserOptions.forgot = localuserOptions.forgot === undefined ? true : localuserOptions.forgot;
+			
+			if (localuserOptions.signup) {
+				server.post(`${uriPrefix}/user/signup`, preMiddleware, localUserHandler.handleSignup, postMiddleware);
+				server.post(`${uriPrefix}/user/verify`, preMiddleware, localUserHandler.handleVerify, postMiddleware);
+			}
+			if (localuserOptions.forgot) {
+				server.post(`${uriPrefix}/user/forgot`, preMiddleware, localUserHandler.handleForgot, postMiddleware);
+				server.post(`${uriPrefix}/user/reset`, preMiddleware, localUserHandler.handleReset, postMiddleware);
+			}
+
+			// You can't disable these routes.
 			server.post(`${uriPrefix}/user/login`, preMiddleware, localUserHandler.handleLogin, postMiddleware);
-			server.post(`${uriPrefix}/user/forgot`, preMiddleware, localUserHandler.handleForgot, postMiddleware);
-			server.post(`${uriPrefix}/user/reset`, preMiddleware, localUserHandler.handleReset, postMiddleware);
 			server.post(`${uriPrefix}/user/logout`, preMiddleware, localUserHandler.handleLogout, postMiddleware);
 
 			// Require middleware on the following routes.
@@ -82,12 +94,20 @@ const TransomLocalUser = function () {
 
 			const preMiddlewareWithLogin = [middleware.isLoggedInMiddleware(), ...preMiddleware];
 			server.get(`${uriPrefix}/user/me`, preMiddlewareWithLogin, localUserHandler.handleUserMe, postMiddleware);
-			server.get(`${uriPrefix}/user/sockettoken`, preMiddlewareWithLogin, localUserHandler.handleSocketToken, postMiddleware);
 
-			// Only logged in users with the 'sysadmin' group can do this!
-			const sysadmin = options.sysadmin || 'sysadmin'; 
-			const preMiddlewareWithGroups = [middleware.isLoggedInMiddleware(), middleware.groupMembershipMiddleware(sysadmin), ...preMiddleware];
-			server.post(`${uriPrefix}/user/:id/forceLogout`, preMiddlewareWithGroups, localUserHandler.handleForceLogout, postMiddleware);
+			// Create a nonce with payload as the current user
+			localuserOptions.sockettoken = localuserOptions.sockettoken === undefined ? true : localuserOptions.sockettoken;
+			if (localuserOptions.sockettoken) {
+				server.get(`${uriPrefix}/user/sockettoken`, preMiddlewareWithLogin, localUserHandler.handleSocketToken, postMiddleware);
+			}
+
+			// Only logged in users with the 'sysadmin' group can do this!		
+			localuserOptions.forcelogout = localuserOptions.forcelogout === undefined ? true : localuserOptions.forcelogout;
+			if (localuserOptions.forcelogout) {
+				const sysadmin = localuserOptions.sysadmin || 'sysadmin'; 
+				const preMiddlewareWithGroups = [middleware.isLoggedInMiddleware(), middleware.groupMembershipMiddleware(sysadmin), ...preMiddleware];					
+				server.post(`${uriPrefix}/user/:id/forceLogout`, preMiddlewareWithGroups, localUserHandler.handleForceLogout, postMiddleware);
+			}
 		});
 	}
 }
