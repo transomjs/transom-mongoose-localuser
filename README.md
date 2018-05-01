@@ -39,11 +39,46 @@ transom.initialize(myApi).then(function(server){
 ```
 
 #### Options
-The API endpoints created by transom-mongoose-localuser support the workflows for creating and verifying users and resetting passwords. It will utilize plugins for sending emails and creating email content from templates. Defaults are used when the options object does not provide alternates. The values on the options object are the registry key strings that return the corresponding handler.<br/>
-Optional configuration values include the named handlers for:
+The API endpoints created by transom-mongoose-localuser support the workflows for creating and verifying users and resetting passwords. 
+It will utilize plugins for sending emails and creating email content from templates. 
+Defaults are used when the options object does not provide alternates. 
+
+*Handler keys on the options object are the registry key strings that return the corresponding handler.
+
+Optional configuration values include:
  - emailHandler : (default 'transomSmtp')
  - templateHandler : (default 'transomTemplate')
  - nonceHandler : (default 'transomNonce')
+
+Route groups can be disabled by passing boolean 'false' values on the following keys:
+ - signup : false (disable registration and new user verification)
+ - forgot : false (disable forgot password and the corresponding verification)
+ - sockettoken: false (disable socket authentication requests)
+ - forcelogout: false (disable a [sysadmin only] route to logout another user)
+
+Default users (administrator & anonymous) can be customized in metadata as well:
+ - administrator: {
+				email: 'admin@my-company.com',
+				username: 'admin',
+				displayName: 'Admin',
+				active: true
+			},
+ - anonymous: false  (the 'anonymous' user is neither created nor considered for authentication)
+ Note, anonymous username is fixed and cannot be customized.
+
+
+```
+    localuser: {
+        signup: false,
+        administrator: {
+            email: 'mark@binaryops.ca',
+            username: 'mvoorberg',
+            displayName: 'Mark Voorberg',
+            active: true
+        },
+        anonymous: false
+    },
+```
 
 #### Security Endpoints
 The transon-mongoose-localuser plugin will create the following routes on a TransomJS REST-API:
@@ -61,10 +96,12 @@ The transon-mongoose-localuser plugin will create the following routes on a Tran
 
 #### Middleware
 After successful initialization of this module there will be an entry in the Transom server registry for validating that the current user (as identified by the Authorization header) is, in fact, Authenticated.
-It can be acccessed using `server.registry.get('isLoggedIn')`.
+It can be acccessed using `server.registry.get('localUserMiddleware')`.
 ```javascript
 const uriPrefix = server.registry.get('transom-config.definition.uri.prefix');
-const isLoggedIn = server.registry.get('isLoggedIn');
+const middleware = server.registry.get('localUserMiddleware');
+const isLoggedIn = middleware.isLoggedInMiddleware();
+
 // Add it to your own routes with your own pre-middleware.
 const yourPreMiddleware = [isLoggedIn, ...preMiddleware];
 const yourPostMiddleware = [];

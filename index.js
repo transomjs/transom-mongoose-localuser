@@ -1,12 +1,10 @@
 'use strict';
-
 const passport = require('passport');
 const debug = require('debug')('transom:mongoose:localuser');
 const localAclGroupSchema = require('./lib/localAclGroupSchema');
 const localAclUserSchema = require('./lib/localAclUserSchema');
 const LocalUserHandler = require('./lib/localUserHandler');
 const passportStrategies = require('./lib/passportStrategies');
-const isLoggedInMiddleware = require('./lib/isLoggedInMiddleware');
 const localUserMiddleware = require('./lib/localUserMiddleware');
 const initializeAcl = require('./lib/initializeAcl');
 const localUserClient = require('./lib/localUserClient');
@@ -44,7 +42,7 @@ const TransomLocalUser = function () {
 			transomAclGroup.on('index', finalizeIndexCreation);
 
 			//initializeAcl.createGroups(server); each plugin should call transomLocalUserClient.setGroups(server, groups)
-			initializeAcl.createDefaultUser(server);
+			initializeAcl.createDefaultUser(server, localuserOptions);
 
 			// This is a server-side client for using & manipulating localUser features.
 			server.registry.set('transomLocalUserClient', localUserClient);
@@ -85,7 +83,8 @@ const TransomLocalUser = function () {
 			// Require middleware on the following routes.
 			const middleware = localUserMiddleware({
 				mongoose: server.registry.get('mongoose'),
-				passport: server.registry.get('passport')
+				passport: server.registry.get('passport'),
+				localuserOptions
 			});
 			server.registry.set('localUserMiddleware', middleware);
 
