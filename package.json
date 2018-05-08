@@ -26,17 +26,17 @@
   },
   "devDependencies": {
     "@transomjs/transom-core": "^1.0.6",
-    "@transomjs/transom-mongoose": "^1.1.18",
+    "@transomjs/transom-mongoose": "^1.3.0",
     "chai": "^4.1.2",
     "coveralls": "^3.0.0",
-    "cross-env": "^5.1.1",
+    "cross-env": "^5.1.4",
     "mocha": "^4.0.1",
     "mocha-lcov-reporter": "^1.3.0",
-    "mongoose": "^4.13.1",
-    "nyc": "^11.2.1",
+    "mongoose": "^4.13.12",
+    "nyc": "^11.7.1",
     "pocket-registry": "^1.1.0",
     "shelljs": "^0.7.8",
-    "sinon": "^4.1.1"
+    "sinon": "^4.5.0"
   },
   "peerDependencies": {
     "@transomjs/transom-core": "^1.0.6",
