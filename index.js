@@ -68,15 +68,18 @@ const TransomLocalUser = function () {
 			localuserOptions.forgot = localuserOptions.forgot === undefined ? true : localuserOptions.forgot;
 			
 			if (localuserOptions.signup) {
+				debug("Adding LocalUser Signup & Verify routes");
 				server.post(`${uriPrefix}/user/signup`, preMiddleware, localUserHandler.handleSignup, postMiddleware);
 				server.post(`${uriPrefix}/user/verify`, preMiddleware, localUserHandler.handleVerify, postMiddleware);
 			}
 			if (localuserOptions.forgot) {
+				debug("Adding LocalUser Forgot & Reset routes");
 				server.post(`${uriPrefix}/user/forgot`, preMiddleware, localUserHandler.handleForgot, postMiddleware);
 				server.post(`${uriPrefix}/user/reset`, preMiddleware, localUserHandler.handleReset, postMiddleware);
 			}
 
 			// You can't disable these routes.
+			debug("Adding LocalUser Login, Logout & Me routes");
 			server.post(`${uriPrefix}/user/login`, preMiddleware, localUserHandler.handleLogin, postMiddleware);
 			server.post(`${uriPrefix}/user/logout`, preMiddleware, localUserHandler.handleLogout, postMiddleware);
 
@@ -97,6 +100,7 @@ const TransomLocalUser = function () {
 			// Create a nonce with payload as the current user
 			localuserOptions.sockettoken = localuserOptions.sockettoken === undefined ? true : localuserOptions.sockettoken;
 			if (localuserOptions.sockettoken) {
+				debug("Adding SocketToken route");
 				server.get(`${uriPrefix}/user/sockettoken`, preMiddlewareWithLogin, localUserHandler.handleSocketToken, postMiddleware);
 			}
 
@@ -105,6 +109,7 @@ const TransomLocalUser = function () {
 			if (localuserOptions.forcelogout) {
 				const sysadmin = localuserOptions.sysadmin || 'sysadmin'; 
 				const preMiddlewareWithGroups = [middleware.isLoggedInMiddleware(), middleware.groupMembershipMiddleware(sysadmin), ...preMiddleware];					
+				debug(`Adding Force User Logout routes for users with ${sysadmin}`);
 				server.post(`${uriPrefix}/user/:id/forceLogout`, preMiddlewareWithGroups, localUserHandler.handleForceLogout, postMiddleware);
 			}
 		});
