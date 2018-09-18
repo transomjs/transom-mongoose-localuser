@@ -1,6 +1,6 @@
 # @transomjs/transom-mongoose-localuser change log
 
-## 
+## 1.4.0-0
 - Updated dependencies to the latest versions & rebuilt the package-lock.json
 - Updated to the latest mongoose 5.2.15
 - Added deploy task to package.json
