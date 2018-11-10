@@ -1,5 +1,8 @@
 # @transomjs/transom-mongoose-localuser change log
 
+## 1.4.1
+- Added a social attribute to the AclUser schema, to be used with future social login providers.
+
 ## 1.4.0
 - Updated dependencies to the latest versions & rebuilt the package-lock.json
 - Required no code changes from the prior beta
