@@ -1,5 +1,8 @@
 # @transomjs/transom-mongoose-localuser change log
 
+## 1.4.2
+- Fixed finalize on AclUser schema, to return the full error object on save errors.
+
 ## 1.4.1
 - Added a social attribute to the AclUser schema, to be used with future social login providers.
 
