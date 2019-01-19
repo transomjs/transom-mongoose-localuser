@@ -49,6 +49,8 @@ Optional configuration values include:
  - emailHandler : (default 'transomSmtp')
  - templateHandler : (default 'transomTemplate')
  - nonceHandler : (default 'transomNonce')
+ - sanitize : (default [])  an Array of Strings, to be used to scrub secrets from the User object loaded during authentication. 
+E.g. Use `sanitize: ['social.google.token']` to hide the token created with a Google OAuth Strategy.
 
 Route groups can be disabled by passing boolean 'false' values on the following keys:
  - signup : false (disable registration and new user verification)
