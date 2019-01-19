@@ -56,7 +56,8 @@ const TransomLocalUser = function () {
 			// Create strategies *after* creating the required Mongoose models!
 			passportStrategies({
 				mongoose,
-				passport
+				passport,
+				sanitize: localuserOptions.sanitize
 			});
 
 			const preMiddleware = localuserOptions.preMiddleware || [];
