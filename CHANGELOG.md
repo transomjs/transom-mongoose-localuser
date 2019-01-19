@@ -1,7 +1,7 @@
 # @transomjs/transom-mongoose-localuser change log
 
 ## 1.4.4
-- Added sanitize option to allow scrubbing the User Object loaded during authentication.
+- Added sanitize option to allow scrubbing the User Object loaded during Bearer strategy authentication.
 
 ## 1.4.3
 - Updated initializeAcl to abstract the setPassword callback, tweaked the AclUser schema to fetch the whole document into req.locals.user.
