@@ -57,7 +57,8 @@ const TransomLocalUser = function () {
 			passportStrategies({
 				mongoose,
 				passport,
-				sanitize: localuserOptions.sanitize
+				sanitize: localuserOptions.sanitize,
+				jwt: localuserOptions.jwt || {}
 			});
 
 			const preMiddleware = localuserOptions.preMiddleware || [];
@@ -91,9 +92,6 @@ const TransomLocalUser = function () {
 				localuserOptions
 			});
 			server.registry.set('localUserMiddleware', middleware);
-
-			// TODO: remove this when the old isLoggedIn function goes away.
-			server.registry.set('isLoggedIn', middleware.isLoggedInMiddleware());
 
 			const preMiddlewareWithLogin = [middleware.isLoggedInMiddleware(), ...preMiddleware];
 			server.get(`${uriPrefix}/user/me`, preMiddlewareWithLogin, localUserHandler.handleUserMe, postMiddleware);
