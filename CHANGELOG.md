@@ -1,5 +1,8 @@
 # @transomjs/transom-mongoose-localuser change log
 
+## 2.0.2
+- Option to disable AclUser bearer updates.
+
 ## 2.0.1
 - Fixing error in the new JWT strategy, required the server instance.
 
