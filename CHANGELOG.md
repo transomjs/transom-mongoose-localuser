@@ -1,5 +1,8 @@
 # @transomjs/transom-mongoose-localuser change log
 
+## 2.0.1
+- Fixing error in the new JWT strategy, required the server instance.
+
 ## 2.0.0
 - Added JWT, with cookie support
 - Removed 'request' as it is no longer required to build the latest bcrypt.
