@@ -54,9 +54,7 @@ const TransomLocalUser = function () {
 			});
 
 			// Create strategies *after* creating the required Mongoose models!
-			passportStrategies({
-				mongoose,
-				passport,
+			passportStrategies(server, {
 				sanitize: localuserOptions.sanitize,
 				jwt: localuserOptions.jwt || {}
 			});
