@@ -59,14 +59,29 @@ Route groups can be disabled by passing boolean 'false' values on the following 
  - forcelogout: false (disable a [sysadmin only] route to logout another user)
 
 Default users (administrator & anonymous) can be customized in metadata as well:
- - administrator: {
-				email: 'admin@my-company.com',
-				username: 'admin',
-				displayName: 'Admin',
-				active: true
-			},
+ - administrator:
+   - email: 'admin@my-company.com',
+   - username: 'admin',
+   - displayName: 'Admin',
+   - active: true
  - anonymous: false  (the 'anonymous' user is neither created nor considered for authentication)
  Note, anonymous username is fixed and cannot be customized.
+
+When using JWTs, configure with a `jwt` node with the following options:
+ - jwt:
+   - secret: "this-is-my-jwt-secret",
+   - algorithm: "HS256",
+   - expireSeconds: 300,
+   - maxAgeSeconds: 200,
+   - cookie: "access_token",
+   - createPayload: function (server, user) {
+            return Promise.resolve({
+                _id: user._id,
+                username: user.username,
+                display_name: user.display_name,
+                email: user.email,
+            });
+        } 
 
 
 ```
