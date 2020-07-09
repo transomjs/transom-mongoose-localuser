@@ -11,7 +11,6 @@ const localUserClient = require('./lib/localUserClient');
 
 const TransomLocalUser = function () {
 	debug("Creating Transom-mongoose-localUser");
-	//This is another develop change
 
 	this.initialize = function (server, options) {
 		return new Promise(function (resolve, reject) {
