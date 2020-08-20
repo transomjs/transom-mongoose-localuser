@@ -45,7 +45,7 @@
     "@transomjs/transom-mongoose": "^2.0.0"
   },
   "dependencies": {
-    "bcrypt": "^4.0.1",
+    "bcrypt": "^5.0.0",
     "debug": "^4.1.1",
     "del-value": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
