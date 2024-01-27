@@ -1,5 +1,5 @@
 const debug = require('debug')('transomjs:mongoose:localuser');
-const expect = require('chai').expect;
+// const expect = require('chai').expect;
 // const sinon = require('sinon');
 // const NonceHandler = require('../lib/nonceHandler');
 const mongoose = require('mongoose');
@@ -10,6 +10,7 @@ const TransomLocalUser = require('../index');
 describe('LocalUserHandler', function (done) {
 
     const server = {};
+    let expect;
 
     before(function () {
 
@@ -32,6 +33,9 @@ describe('LocalUserHandler', function (done) {
 
         const options = {};
         TransomLocalUser.initialize(server, options);
+
+        // Use a dynamic import for the chai ES module!
+        return import("chai").then((chai) => (expect = chai.expect));
     });
 
     after(function() {
