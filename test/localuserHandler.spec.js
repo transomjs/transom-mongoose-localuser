@@ -31,7 +31,10 @@ describe('LocalUserHandler', function (done) {
             server.registry.set(`post|${arguments[0]}`, Array.prototype.slice.call(arguments, 1))
         }
 
-        const options = {};
+        const options = {
+            administrator: false,
+            anonymous: false
+        };
         TransomLocalUser.initialize(server, options);
 
         // Use a dynamic import for the chai ES module!
