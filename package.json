@@ -1,6 +1,6 @@
 {
   "name": "@transomjs/transom-mongoose-localuser",
-  "version": "3.0.1",
+  "version": "5.0.0",
   "description": "Add local authentication to your Transom REST API.",
   "main": "index.js",
   "scripts": {
@@ -39,20 +39,20 @@
     "sinon": "^17.0.1"
   },
   "peerDependencies": {
-    "@transomjs/transom-core": "^2.0.2 || ^3.0.0",
-    "@transomjs/transom-mongoose": "^2.0.0 || ^3.0.0 || ^4.0.0"
+    "@transomjs/transom-core": "^5.0.1-0",
+    "@transomjs/transom-mongoose": "^5.0.1-0"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "debug": "^4.1.1",
     "del-value": "^1.0.0",
+    "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "passport": "^0.7.0",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.1",
     "passport-local-mongoose": "^8.0.0",
-    "restify-errors": "^8.0.2",
     "uuid": "^9.0.1"
   }
 }
